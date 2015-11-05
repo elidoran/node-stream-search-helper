@@ -11,16 +11,13 @@ describe 'test search', ->
 
       search = buildSearch delim:'\n', min:1
       results = search testString # gives before:'some string',delim:'\n'
-      #result2 = search 'ing'      # gives
       end = search.end()
-      #console.log 'results:',results
-      #console.log 'end:',end
       expectedResults = [ 'some string', 'for testing' ]
       assert.equal results.length, 2, 'search should return two results'
       assert.equal results[0].before, expectedResults[0]
       assert.equal results[0].delim, '\n'
       assert.equal results[1].string, expectedResults[1]
-      assert.equal end.string, ''
+      assert.equal end.string, undefined
 
   describe 'with newline delim', ->
 
@@ -31,8 +28,6 @@ describe 'test search', ->
       search = buildSearch delim:/(?:[^\\]|\\\\)({{)/, min:4 # non-escaped open braces
       results = search testString
       end = search.end()
-      #console.log 'results:',results
-      #console.log 'end:',end
       expectedResults = [ 'som', 'key' ]
       assert.equal results.length, 1, 'search should return a single result'
       assert.equal results[0].before, expectedResults[0]
@@ -53,10 +48,6 @@ describe 'test search', ->
       results2 = search()
       end = search.end()
 
-      #console.log 'results1:',results1
-      #console.log 'results2:',results2
-      #console.log 'end:',end
-
       assert.equal results1.length, 1, 'search should return a single result'
 
       assert.equal results1[0].before, 'some'
@@ -70,3 +61,41 @@ describe 'test search', ->
       assert.equal results2[0].g1, '}}'
 
       assert.equal end.string, ' string'
+
+  describe 'with only delim', ->
+
+    it 'should find nothing', () ->
+
+      testString = 'delim'
+
+      search = buildSearch delim:'delim', min:5
+
+      results = search testString
+      end = search.end()
+
+      assert.equal results.length, 1, 'search should return a single result'
+
+      assert.equal results[0].before, '', 'before should be an empty string'
+      assert.equal results[0].delim, 'delim', 'delim is `delim`'
+
+      assert.equal end.string, undefined, 'end string should be undefined'
+
+  describe 'with delim at start', ->
+
+    it 'should find delim and later string', () ->
+
+      testString = 'delim and more'
+
+      search = buildSearch delim:'delim', min:5
+
+      results = search testString
+      end = search.end()
+
+      assert.equal results.length, 2, 'search should return a double result'
+
+      assert.equal results[0].before, '', 'before should be an empty string'
+      assert.equal results[0].delim, 'delim', 'delim is `delim`'
+
+      assert.equal results[1].string, ' and '
+
+      assert.equal end.string, 'more'
