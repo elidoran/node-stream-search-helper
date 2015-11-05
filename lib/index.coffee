@@ -52,7 +52,10 @@ module.exports = (options) ->
     return resultsArray  # done with search, return array of results
 
   # like flush() for a stream, gets what has been stored up, unprocessed
-  search.end = -> result = string:store ; store = '' ; result
+  search.end = ->
+    result = if store.length > 0 then string:store else {}
+    store = ''
+    return result
 
   # allows changing the delim and min (keep) values
   search.delim = (newDelim, min) ->
