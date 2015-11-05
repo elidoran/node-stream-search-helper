@@ -35,7 +35,7 @@ results = search string
 
 results = [ # an array, each a search match
   before:'some', delim:' '  # `before` is the string content before the delim
-  before:'test', delim:' '
+  before:'test', delim:' '  # recurse:true by default so matches a second time
 ]
 
 end = search.end() # get any leftovers (think 'flush')
@@ -51,8 +51,8 @@ string = 'some {{key}} string'
 results = search string
 
 results = [ # an array, each a search match
-  before:'some ', delim:'{{'  # `before` is the string content before the delim
-  before:'key', delim:'}}'
+  before:'some ', delim:'{{'  # `delim` is the delim matched, helpful for regex
+  before:'key', delim:'}}'    # note delim is different this time
 ]
 
 end = search.end() # get any leftovers (think 'flush')
@@ -144,7 +144,7 @@ results = search 'some string'
 # results will have 'some' in it
 # to get the leftover 'string' part:
 end = search.end()
-# end is an object with a `string` property, which, contains the value 'string' in this example.
+# end is an object with a `string` property, which, contains the value 'string'
 ```
 
 ## MIT License
