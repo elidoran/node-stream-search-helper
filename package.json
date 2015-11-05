@@ -1,0 +1,40 @@
+{
+  "name": "stream-search-helper",
+  "version": "0.5.0",
+  "description": "Aids streams searching with string or regex delimiters.",
+  "main": "lib",
+  "keywords": [
+    "stream",
+    "search",
+    "delimiter",
+    "delim",
+    "regex",
+    "regular expression",
+    "chunk",
+    "split",
+    "splitter"
+  ],
+  "author": "Eli Doran <eli+npm@elidoran.com>",
+  "license": "MIT",
+  "scripts": {
+    "compile": "coffee --bare --compile lib",
+    "clean": "rm -rf lib/*.js",
+    "prepublish": "coffee --bare --compile lib",
+    "postpublish": "rm -rf lib/*.js",
+    "test": "mocha --compilers coffee:coffee-script/register --reporter spec --bail --check-leaks test/lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/elidoran/node-stream-search-helper.git"
+  },
+  "bugs": "http://github.com/elidoran/node-stream-search-helper/issues",
+  "devDependencies": {
+    "coffee-script": "^1.10.0",
+    "mocha": "^2.3.3",
+    "through2": "^2.0.0"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=0.10"
+  }
+}
