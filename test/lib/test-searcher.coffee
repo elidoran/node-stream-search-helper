@@ -25,7 +25,7 @@ describe 'test search', ->
 
       testString = 'some{{key'
 
-      search = buildSearch delim:/(\\\\)?({{|}})/, min:4, groups:2
+      search = buildSearch delim:/(\\{1,2})?({{|}})/, min:4, groups:2
       results = search testString
       end = search.end()
       expectedResults = [ 'some', 'key' ]
@@ -42,10 +42,10 @@ describe 'test search', ->
 
       testString = 'some {{key}} string'
 
-      search = buildSearch delim:/(\\\\)?({{)/, min:4, recurse:false, groups:2
+      search = buildSearch delim:/(\\{1,2})?({{)/, min:4, recurse:false, groups:2
 
       results1 = search testString
-      search.delim /(\\\\)?(}})/
+      search.delim /(\\{1,2})?(}})/
       results2 = search()
       end = search.end()
 
@@ -67,11 +67,11 @@ describe 'test search', ->
 
   describe 'with escaped slash before open braces delim', ->
 
-    it 'should find two strings', () ->
+    it 'should find two strings and show double escape in g1', () ->
 
       testString = 'some\\\\{{key'
 
-      search = buildSearch delim:/(\\\\)?({{|}})/, min:4, groups:2
+      search = buildSearch delim:/(\\{1,2})?({{|}})/, min:4, groups:2
       results = search testString
       end = search.end()
       expectedResults = [ 'some', 'key' ]
@@ -84,14 +84,14 @@ describe 'test search', ->
 
   describe 'with escaped slash before open/close braces delim', ->
 
-    it 'should find two strings', () ->
+    it 'should find two strings and show double escape in g1', () ->
 
       testString = 'some \\\\{{key}} string'
 
-      search = buildSearch delim:/(\\\\)?({{)/, min:4, recurse:false, groups:2
+      search = buildSearch delim:/(\\{1,2})?({{)/, min:4, recurse:false, groups:2
 
       results1 = search testString
-      search.delim /(\\\\)?(}})/
+      search.delim /(\\{1,2})?(}})/
       results2 = search()
       end = search.end()
 
@@ -107,6 +107,50 @@ describe 'test search', ->
       assert.equal results2[0].before, 'key'
       assert.equal results2[0].delim, '}}'
       assert.equal results2[0].g1, undefined, 'no g1 should be captured'
+      assert.equal results2[0].g2, '}}'
+
+      assert.equal end.string, ' string'
+
+  describe 'with escape before open braces delim', ->
+
+    it 'should find two strings and show single escape in g1', () ->
+
+      testString = 'some\\{{key'
+
+      search = buildSearch delim:/(\\{1,2})?({{|}})/, min:4, groups:2
+      results = search testString
+      end = search.end()
+      assert.equal results.length, 1, 'search should return a single result'
+      assert.equal results[0].before, 'some'
+      assert.equal results[0].delim, '\\{{'
+      assert.equal results[0].g1, '\\'
+      assert.equal results[0].g2, '{{'
+
+      assert.equal end.string, 'key'
+
+  describe 'with escape before open/close braces delim', ->
+
+    it 'should find two strings and show single escape in g1', () ->
+
+      testString = 'some \\{{key\\}} string'
+
+      search = buildSearch delim:/(\\{1,2})?({{)/, min:4, recurse:false, groups:2
+
+      results1 = search testString
+      search.delim /(\\{1,2})?(}})/
+      results2 = search()
+      end = search.end()
+
+      assert.equal results1.length, 1, 'search should return a single result'
+      assert.equal results1[0].before, 'some '
+      assert.equal results1[0].delim, '\\{{'
+      assert.equal results1[0].g1, '\\'
+      assert.equal results1[0].g2, '{{'
+
+      assert.equal results2.length, 1, 'search should return a single result'
+      assert.equal results2[0].before, 'key'
+      assert.equal results2[0].delim, '\\}}'
+      assert.equal results2[0].g1, '\\'
       assert.equal results2[0].g2, '}}'
 
       assert.equal end.string, ' string'
