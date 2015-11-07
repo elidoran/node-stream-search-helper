@@ -1,3 +1,9 @@
+0.7.1 - Released 2015/11/07
+
+1. `delim()` accepts options object as second argument instead of `min`
+2. accepts `groups` option representing number of regex capture groups to include
+3. test for double slash before delim
+4. test for single slash before delim
 
 0.6.0 - Released 2015/11/05
 
