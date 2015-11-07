@@ -18,7 +18,8 @@ module.exports = (options) ->
   search = (input = '', resultsArray = []) ->
     # combine stored string with new input string
     string = store + input
-
+    # reset `store` to empty string
+    store = ''
     # unless there is enough string to search just store it and return
     unless string.length >= keep
       store = string
@@ -44,7 +45,7 @@ module.exports = (options) ->
         store = string[-keep...]
       else # don't keep any, pass on all of it
         searched = string:string
-        store = ''
+        # store is already set to ''
 
       # only add this result is there was some content to it
       if searched.string.length > 0 then resultsArray.push searched
