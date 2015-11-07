@@ -19,46 +19,95 @@ describe 'test search', ->
       assert.equal results[1].string, expectedResults[1]
       assert.equal end.string, undefined
 
-  describe 'with newline delim', ->
+  describe 'with open braces delim', ->
 
     it 'should find two strings', () ->
 
       testString = 'some{{key'
 
-      search = buildSearch delim:/(?:[^\\]|\\\\)({{)/, min:4 # non-escaped open braces
+      search = buildSearch delim:/(\\\\)?({{|}})/, min:4, groups:2
       results = search testString
       end = search.end()
-      expectedResults = [ 'som', 'key' ]
+      expectedResults = [ 'some', 'key' ]
       assert.equal results.length, 1, 'search should return a single result'
       assert.equal results[0].before, expectedResults[0]
-      assert.equal results[0].delim, 'e{{'
-      assert.equal results[0].g1, '{{'
+      assert.equal results[0].delim, '{{'
+      assert.equal results[0].g1, undefined, 'no g1 should be captured'
+      assert.equal results[0].g2, '{{'
       assert.equal end.string, 'key'
 
-  describe 'with newline delim', ->
+  describe 'with open/close braces delim', ->
 
     it 'should find two strings', () ->
 
       testString = 'some {{key}} string'
 
-      search = buildSearch delim:/(?:[^\\]|\\\\)({{)/, min:4, recurse:false
+      search = buildSearch delim:/(\\\\)?({{)/, min:4, recurse:false, groups:2
 
       results1 = search testString
-      search.delim /(?:[^\\]|\\\\)(}})/, 4
+      search.delim /(\\\\)?(}})/
       results2 = search()
       end = search.end()
 
       assert.equal results1.length, 1, 'search should return a single result'
 
-      assert.equal results1[0].before, 'some'
-      assert.equal results1[0].delim, ' {{'
-      assert.equal results1[0].g1, '{{'
+      assert.equal results1[0].before, 'some '
+      assert.equal results1[0].delim, '{{'
+      assert.equal results1[0].g1, undefined, 'no g1 should be captured'
+      assert.equal results1[0].g2, '{{'
 
       assert.equal results2.length, 1, 'search should return a single result'
 
-      assert.equal results2[0].before, 'ke'
-      assert.equal results2[0].delim, 'y}}'
-      assert.equal results2[0].g1, '}}'
+      assert.equal results2[0].before, 'key'
+      assert.equal results2[0].delim, '}}'
+      assert.equal results2[0].g1, undefined, 'no g1 should be captured'
+      assert.equal results2[0].g2, '}}'
+
+      assert.equal end.string, ' string'
+
+  describe 'with escaped slash before open braces delim', ->
+
+    it 'should find two strings', () ->
+
+      testString = 'some\\\\{{key'
+
+      search = buildSearch delim:/(\\\\)?({{|}})/, min:4, groups:2
+      results = search testString
+      end = search.end()
+      expectedResults = [ 'some', 'key' ]
+      assert.equal results.length, 1, 'search should return a single result'
+      assert.equal results[0].before, expectedResults[0]
+      assert.equal results[0].delim, '\\\\{{'
+      assert.equal results[0].g1, '\\\\'
+      assert.equal results[0].g2, '{{'
+      assert.equal end.string, 'key'
+
+  describe 'with escaped slash before open/close braces delim', ->
+
+    it 'should find two strings', () ->
+
+      testString = 'some \\\\{{key}} string'
+
+      search = buildSearch delim:/(\\\\)?({{)/, min:4, recurse:false, groups:2
+
+      results1 = search testString
+      search.delim /(\\\\)?(}})/
+      results2 = search()
+      end = search.end()
+
+      assert.equal results1.length, 1, 'search should return a single result'
+
+      assert.equal results1[0].before, 'some '
+      assert.equal results1[0].delim, '\\\\{{'
+      assert.equal results1[0].g1, '\\\\'
+      assert.equal results1[0].g2, '{{'
+
+      assert.equal results2.length, 1, 'search should return a single result'
+
+      assert.equal results2[0].before, 'key'
+      assert.equal results2[0].delim, '}}'
+      assert.equal results2[0].g1, undefined, 'no g1 should be captured'
+      assert.equal results2[0].g2, '}}'
 
       assert.equal end.string, ' string'
 
