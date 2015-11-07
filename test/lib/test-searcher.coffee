@@ -99,3 +99,27 @@ describe 'test search', ->
       assert.equal results[1].string, ' and '
 
       assert.equal end.string, 'more'
+
+  describe 'with delim split across search', ->
+
+    it 'should return all results', ->
+
+      testString1 = 'oneDEL'
+      testString2 = 'IMtwoDELIMthree'
+
+      search = buildSearch delim:'DELIM', min:'5', recurse:true
+
+      results = search testString1
+      assert.equal results.length, 1, 'search should return 1 result from first search'
+      assert.equal results[0].string, 'on'
+
+      results = search testString2
+      assert.equal results.length, 3, 'search should return 3 results from second search'
+      assert.equal results[0].before, 'e'
+      assert.equal results[0].delim, 'DELIM'
+      assert.equal results[1].before, 'two'
+      assert.equal results[1].delim, 'DELIM'
+      assert.equal results[2].string, 't'
+
+      end = search.end()
+      assert.equal end.string, 'hree'
